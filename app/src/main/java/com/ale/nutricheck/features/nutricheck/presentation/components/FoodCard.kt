@@ -52,8 +52,7 @@ fun FoodCard(food: Food, onAddClick: () -> Unit) {
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Desglose de Macronutrientes usando el nuevo componente
+
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         MacroIndicator(label = "P", value = food.proteins, color = Color(0xFF4CAF50))
                         MacroIndicator(label = "G", value = food.fats, color = Color(0xFFFFC107))

@@ -44,6 +44,6 @@ fun FoodDto.toDomain(): Food {
         proteins = proteins,
         fats = fats,
         carbs = carbs,
-        isHealthy = sugars < 5.0 && fats < 10.0 // Criterio de salud más completo
+        isHealthy = sugars < 5.0 && fats < 10.0
     )
 }

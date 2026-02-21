@@ -3,9 +3,12 @@ package com.ale.nutricheck.features.nutricheck.domain.usecases
 import com.ale.nutricheck.features.nutricheck.domain.repositories.FoodRepository
 import com.ale.nutricheck.features.nutricheck.domain.entities.Food
 import kotlinx.coroutines.CancellationException
+import javax.inject.Inject
 
-class GetFoodsUseCase(private val repository: FoodRepository) {
-   suspend operator fun invoke(query: String, maxCalories: Double): Result<List<Food>> {
+class GetFoodsUseCase @Inject constructor(
+    private val repository: FoodRepository
+) {
+    suspend operator fun invoke(query: String, maxCalories: Double): Result<List<Food>> {
         return try {
             val foods = repository.getFoods(query)
 

@@ -16,16 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.ale.nutricheck.features.nutricheck.presentation.screens.NutriCheckUiState
+import com.ale.nutricheck.features.nutricheck.presentation.state.NutriCheckUiState
 
 @Composable
 fun CalorieHeader(
     uiState: NutriCheckUiState,
     onGoalChange: (String) -> Unit
 ) {
-    val isExceeded = uiState.consumedCalories > uiState.dailyCalorieGoal && uiState.dailyCalorieGoal > 0
-    
-    // Animación de color de fondo
+    val isExceeded = uiState.totalCalories > uiState.maxCalories && uiState.maxCalories > 0
+
     val backgroundColor by animateColorAsState(
         targetValue = if (isExceeded) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surfaceVariant,
         animationSpec = tween(durationMillis = 500)
@@ -47,7 +46,7 @@ fun CalorieHeader(
             )
 
             OutlinedTextField(
-                value = if (uiState.dailyCalorieGoal == 0.0) "" else uiState.dailyCalorieGoal.toInt().toString(),
+                value = if (uiState.maxCalories == 0.0) "" else uiState.maxCalories.toInt().toString(),
                 onValueChange = onGoalChange,
                 label = { Text("Kcal permitidas") },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -59,10 +58,10 @@ fun CalorieHeader(
                 )
             )
 
-            if (uiState.dailyCalorieGoal > 0) {
+            if (uiState.maxCalories > 0) {
                 // Animación suave de la barra de progreso
                 val animatedProgress by animateFloatAsState(
-                    targetValue = (uiState.consumedCalories / uiState.dailyCalorieGoal).toFloat().coerceIn(0f, 1.1f),
+                    targetValue = (uiState.totalCalories / uiState.maxCalories).toFloat().coerceIn(0f, 1.1f),
                     animationSpec = tween(durationMillis = 800)
                 )
 
@@ -78,7 +77,7 @@ fun CalorieHeader(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "${uiState.consumedCalories.toInt()} / ${uiState.dailyCalorieGoal.toInt()} kcal",
+                        text = "${uiState.totalCalories.toInt()} / ${uiState.maxCalories.toInt()} kcal",
                         style = MaterialTheme.typography.labelLarge,
                         color = if (isExceeded) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold

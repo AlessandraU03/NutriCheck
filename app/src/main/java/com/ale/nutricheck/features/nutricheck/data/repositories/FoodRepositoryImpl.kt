@@ -1,15 +1,18 @@
 package com.ale.nutricheck.features.nutricheck.data.repositories
 
-import com.ale.nutricheck.core.network.NutriApi
+import android.util.Log
+import com.ale.nutricheck.features.nutricheck.data.datasources.remote.api.OpenFoodFactsApi
 import com.ale.nutricheck.features.nutricheck.data.datasources.remote.mapper.toDomain
 import com.ale.nutricheck.features.nutricheck.domain.repositories.FoodRepository
 import com.ale.nutricheck.features.nutricheck.domain.entities.Food
+import javax.inject.Inject
 
-class FoodRepositoryImpl(
-    private val api: NutriApi
+class FoodRepositoryImpl @Inject constructor(
+    private val api: OpenFoodFactsApi
 ) : FoodRepository {
     override suspend fun getFoods(query: String): List<Food> {
-        val response = api.searchProducts(query)
+        val response = api.getFoods(query)
+        Log.d("OpenFoodFacts", response.toString())
         return response.products.map { it.toDomain() }
     }
 }

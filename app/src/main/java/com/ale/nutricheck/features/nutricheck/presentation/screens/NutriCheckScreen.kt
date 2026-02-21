@@ -14,26 +14,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ale.nutricheck.features.nutricheck.presentation.viewmodel.FoodViewModel
-import com.ale.nutricheck.features.nutricheck.presentation.viewmodel.FoodViewModelFactory
 import com.ale.nutricheck.features.nutricheck.presentation.components.FoodCard
 import com.ale.nutricheck.features.nutricheck.presentation.components.CalorieHeader
 
 @Composable
-fun NutriCheckScreen(factory: FoodViewModelFactory) {
-    val viewModel: FoodViewModel = viewModel(factory = factory)
+fun NutriCheckScreen(viewModel: FoodViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var searchText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Mostrar Snackbar cuando hay un mensaje
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
             snackbarHostState.showSnackbar(it)
@@ -53,18 +48,15 @@ fun NutriCheckScreen(factory: FoodViewModelFactory) {
             )
 
             OutlinedTextField(
-                value = searchText,
-                onValueChange = { 
-                    searchText = it
-                    viewModel.searchFoods(it) 
-                },
+                value = uiState.searchText,
+                onValueChange = { viewModel.onSearchTextChange(it) },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
                 placeholder = { Text("Busca alimentos de tu preferencia (jugo, pan, etc.)") },
                 shape = RoundedCornerShape(16.dp),
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = {
-                    viewModel.searchFoods(searchText)
+                    viewModel.searchFoods(uiState.searchText)
                     focusManager.clearFocus()
                 }),
                 singleLine = true
@@ -91,14 +83,15 @@ fun NutriCheckScreen(factory: FoodViewModelFactory) {
                                 color = Color.Red,
                                 textAlign = TextAlign.Center
                             )
-                            Button(onClick = { viewModel.searchFoods(searchText) }) {
+                            Button(onClick = { viewModel.searchFoods(uiState.searchText) }) {
                                 Text("Reintentar")
                             }
                         }
                     }
                     uiState.foods.isEmpty() -> {
                         Text(
-                            text = if (searchText.isEmpty()) "Busca algo para empezar" else "No se encontraron resultados",
+                            text = if (uiState.searchText.isEmpty()) "Busca algo para empezar"
+                            else "No se encontraron resultados",
                             modifier = Modifier.align(Alignment.Center),
                             color = Color.Gray
                         )
